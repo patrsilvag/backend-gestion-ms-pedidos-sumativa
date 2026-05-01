@@ -13,6 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pedidos") // Cambiado de productos a pedidos
+@CrossOrigin(origins = "http://localhost:4200")
 public class PedidoController {
 
     @Autowired
