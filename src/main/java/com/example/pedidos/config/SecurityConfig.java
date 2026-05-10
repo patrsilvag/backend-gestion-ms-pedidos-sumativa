@@ -22,9 +22,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(
                         auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                // Permitimos la ruta de compra para las pruebas de la Sumativa
+                                // Ruta de pedidos abierta para la Sumativa 3
                                 .requestMatchers("/api/pedidos/**").permitAll()
-                                .requestMatchers("/error").permitAll().anyRequest().authenticated())
+                                .requestMatchers("/error").permitAll()
+                                .anyRequest().authenticated())
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -34,8 +35,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Permitimos el puerto 80 (Docker) y 4200 (Local)
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost", "http://localhost:4200"));
+        // ✅ Se añade 'http://mi-app-docker' para el entorno orquestado
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://mi-app-docker", 
+            "http://localhost", 
+            "http://localhost:4200"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);

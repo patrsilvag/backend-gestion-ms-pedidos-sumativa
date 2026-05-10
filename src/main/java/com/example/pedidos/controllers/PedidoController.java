@@ -12,7 +12,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pedidos")
-@CrossOrigin(origins = "http://localhost:4200")
+// ✅ Se actualizan los orígenes para incluir el dominio de Docker
+@CrossOrigin(origins = { "http://mi-app-docker", "http://localhost:4200", "http://localhost" })
 public class PedidoController {
 
     private final PedidoService pedidoService;
@@ -21,7 +22,8 @@ public class PedidoController {
         this.pedidoService = pedidoService;
     }
 
-    @GetMapping
+    // ✅ Permite /api/pedidos y /api/pedidos/ para evitar error 500 en Nginx
+    @GetMapping({ "", "/" })
     public ResponseEntity<List<PedidoResponse>> listarHistorial() {
         return ResponseEntity.ok(pedidoService.listarTodos());
     }
@@ -36,11 +38,10 @@ public class PedidoController {
             @Valid @RequestBody CompraRequest request) {
         PedidoResponse nuevoPedido = pedidoService.registrarPedido(request);
 
-        // Definimos el tipo concreto Map<String, Object> para evitar el wildcard
-        Map<String, Object> respuesta =
-                Map.of("mensaje", "Pago realizado con éxito. Su pedido está en camino.", "pedidoId",
-                        nuevoPedido.getId(), "productoId", nuevoPedido.getProductoId(), "cantidad",
-                        nuevoPedido.getCantidad(), "fecha", nuevoPedido.getFechaPedido());
+        Map<String, Object> respuesta = Map.of("mensaje", "Pago realizado con éxito. Su pedido está en camino.",
+                "pedidoId",
+                nuevoPedido.getId(), "productoId", nuevoPedido.getProductoId(), "cantidad",
+                nuevoPedido.getCantidad(), "fecha", nuevoPedido.getFechaPedido());
 
         return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
     }
